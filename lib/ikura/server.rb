@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "socket"
+require "uri"
 require "erb"
 
 module Ikura
@@ -11,8 +12,17 @@ module Ikura
       new(port:).run
     end
 
+    COORDS = [
+      [50, 50], [35, 50], [65, 50], [20, 50], [80, 50],
+      [50, 15], [35, 22], [65, 22], [20, 35], [80, 35],
+      [50, 85], [35, 78], [65, 78], [20, 65], [80, 65],
+      [10, 50], [90, 50],
+      [50, 30], [50, 70], [28, 38], [72, 38], [28, 62], [72, 62],
+    ].freeze
+
     def initialize(port: 8080)
       @port = port
+      @ikura_count = 0
     end
 
     def run
@@ -41,12 +51,31 @@ module Ikura
       case [req[:method], req[:path]]
       in ["GET", "/"]
         respond(client, type: "text/html; charset=utf-8", body: html_page)
+      in ["POST", "/ikura"]
+        coord_idx = parse_form(req[:body])["coord"]&.to_i || 0
+        x, y = COORDS[coord_idx] || [50, 50]
+        id = @ikura_count
+        @ikura_count += 1
+
+        jx = (x + rand(-8..8)).clamp(5, 95)
+        jy = (y + rand(-8..8)).clamp(5, 95)
+
+        respond(client,
+          type: "text/vnd.turbo-stream.html; charset=utf-8",
+          body: Ikura::Builder.append("ikura-layer",
+            "<li id='ikura_#{id}' class='ikura' style='left:#{jx}%;top:#{jy}%'></li>"))
+
+        puts "  → append ikura_#{id} at (#{jx}%, #{jy}%)"
       else
         respond(client, status: "404 Not Found", type: "text/plain", body: "Not found")
       end
     end
 
     def html_page
+      coords_html = COORDS.each_with_index.map { |(x, y), i|
+        "<div class='coord' style='left:#{x}%;top:#{y}%' onclick='addIkura(#{i})'></div>"
+      }.join("\n")
+
       ERB.new(File.read(TEMPLATE_PATH)).result(binding)
     end
 
@@ -62,7 +91,16 @@ module Ikura
         headers[key.strip.downcase] = val&.strip
       end
 
-      { method:, path:, headers: }
+      body = nil
+      if (len = headers["content-length"]&.to_i)&.positive?
+        body = client.read(len)
+      end
+
+      { method:, path:, headers:, body: }
+    end
+
+    def parse_form(body)
+      URI.decode_www_form(body.to_s).to_h
     end
 
     def respond(client, status: "200 OK", type:, body:)

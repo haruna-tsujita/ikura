@@ -3,6 +3,19 @@
   <head>
     <meta charset="UTF-8">
     <title>🍣 Ikura</title>
+    <script type="module">
+      import { DefaultRubyVM } from "https://cdn.jsdelivr.net/npm/@ruby/wasm-wasi@2.8.1/dist/browser/+esm";
+      const res = await fetch("https://cdn.jsdelivr.net/npm/@ruby/4.0-wasm-wasi@2.8.1/dist/ruby+stdlib.wasm");
+      const { vm } = await DefaultRubyVM(await WebAssembly.compileStreaming(res));
+      window.rubyVM = vm;
+      vm.eval(`
+require "js"
+nodes = JS.global[:document].call(:querySelectorAll, ".coord")
+nodes[:length].to_i.times do |i|
+  nodes.call(:item, i)[:style][:opacity] = "1"
+end
+      `);
+    </script>
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
       body { background: #ffffff; overflow: hidden; width: 100vw; height: 100vh; }
@@ -28,14 +41,73 @@
         background: radial-gradient(ellipse at 50% 60%, #f8f4ec, #e8e0cc);
         border-radius: 50%;
       }
+
+      .coord {
+        position: absolute;
+        transform: translate(-50%, -50%);
+        width: 16px; height: 16px;
+        cursor: crosshair;
+        pointer-events: all;
+        opacity: 0;
+      }
+
+      #ikura-layer {
+        position: absolute; inset: 0;
+        pointer-events: none; list-style: none;
+      }
+
+      .ikura {
+        position: absolute;
+        transform: translate(-50%, -50%);
+        width: 14px; height: 14px;
+        border-radius: 50%;
+        background: radial-gradient(circle at 35% 30%, #ffbb66, #cc2200);
+        border: 1px solid rgba(255,180,100,0.3);
+        animation: pop 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      }
+      @keyframes pop {
+        from { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+        to   { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+      }
     </style>
   </head>
   <body>
     <div id="board">
       <div class="gunkan">
         <div class="gunkan-top">
+          <%= coords_html %>
+          <ul id="ikura-layer"></ul>
         </div>
       </div>
     </div>
+
+    <script>
+      async function addIkura(coordIdx) {
+        await window.rubyVM.evalAsync(`
+require "js"
+doc      = JS.global[:document]
+response = JS.global.fetch("/ikura", JS.eval("return {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+  body: 'coord=${coordIdx}'
+}")).await
+html = response.text().await.to_s
+
+div = doc.call(:createElement, "div")
+div[:innerHTML] = html
+div.call(:querySelectorAll, "turbo-stream")[:length].to_i.times do |i|
+  el      = div.call(:querySelectorAll, "turbo-stream").call(:item, i)
+  action  = el.call(:getAttribute, "action").to_s
+  target  = el.call(:getAttribute, "target").to_s
+  content = el.call(:querySelector, "template")[:innerHTML].to_s rescue ""
+  node    = doc.call(:getElementById, target)
+  case action
+  when "append" then node.call(:insertAdjacentHTML, "beforeend", content)
+  end
+end
+        `);
+      }
+
+    </script>
   </body>
 </html>
