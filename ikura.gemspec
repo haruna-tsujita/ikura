@@ -11,12 +11,13 @@ Gem::Specification.new do |spec|
   spec.summary = "An interactive gunkan-maki sushi toy server powered by Ruby Wasm"
   spec.description = "Ikura is a tiny HTTP server that renders an interactive gunkan-maki sushi in the browser. Click anywhere on the sushi to place ikura (salmon roe) using Ruby running in WebAssembly."
   spec.homepage = "https://github.com/haruna-tsujita/ikura"
+  spec.license = "MIT"
   spec.required_ruby_version = ">= 4.0.2"
 
   spec.metadata["allowed_push_host"] = "https://rubygems.org"
 
   spec.metadata["homepage_uri"] = spec.homepage
-  spec.metadata["source_code_uri"] = "https://github.com/haruna-tsujita/ikura"
+  spec.metadata["source_code_uri"] = "https://github.com/haruna-tsujita/ikura/tree/master"
   spec.metadata["changelog_uri"] = "https://github.com/haruna-tsujita/ikura/blob/master/CHANGELOG.md"
 
   # Specify which files should be added to the gem when it is released.
