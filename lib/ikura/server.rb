@@ -73,7 +73,7 @@ module Ikura
 
     def html_page
       coords_html = COORDS.each_with_index.map { |(x, y), i|
-        "<div class='coord' style='left:#{x}%;top:#{y}%' onclick='addIkura(#{i})'></div>"
+        "<div class='coord' style='left:#{x}%;top:#{y}%'></div>"
       }.join("\n")
 
       ERB.new(File.read(TEMPLATE_PATH)).result(binding)

@@ -10,9 +10,38 @@
       window.rubyVM = vm;
       vm.eval(`
 require "js"
-nodes = JS.global[:document].call(:querySelectorAll, ".coord")
+doc   = JS.global[:document]
+nodes = doc.call(:querySelectorAll, ".coord")
 nodes[:length].to_i.times do |i|
-  nodes.call(:item, i)[:style][:opacity] = "1"
+  node = nodes.call(:item, i)
+  node[:style][:opacity] = "1"
+  node.call(:addEventListener, "click", ->(event) {
+    opts = JS.eval("return {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: 'coord=#{i}'
+    }")
+    JS.global.fetch("/ikura", opts).call(:then, ->(response) {
+      response.text().call(:then, ->(text) {
+        doc = JS.global[:document]
+        div = doc.call(:createElement, "div")
+        div[:innerHTML] = text.to_s
+        div.call(:querySelectorAll, "turbo-stream")[:length].to_i.times do |j|
+          el          = div.call(:querySelectorAll, "turbo-stream").call(:item, j)
+          action      = el.call(:getAttribute, "action").to_s
+          target      = el.call(:getAttribute, "target").to_s
+          content     = el.call(:querySelector, "template")[:innerHTML].to_s rescue ""
+          target_node = doc.call(:getElementById, target)
+          case action
+          when "append" then target_node.call(:insertAdjacentHTML, "beforeend", content)
+          end
+        end
+        nil
+      })
+      nil
+    })
+    nil
+  })
 end
       `);
     </script>
@@ -81,33 +110,5 @@ end
       </div>
     </div>
 
-    <script>
-      async function addIkura(coordIdx) {
-        await window.rubyVM.evalAsync(`
-require "js"
-doc      = JS.global[:document]
-response = JS.global.fetch("/ikura", JS.eval("return {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-  body: 'coord=${coordIdx}'
-}")).await
-html = response.text().await.to_s
-
-div = doc.call(:createElement, "div")
-div[:innerHTML] = html
-div.call(:querySelectorAll, "turbo-stream")[:length].to_i.times do |i|
-  el      = div.call(:querySelectorAll, "turbo-stream").call(:item, i)
-  action  = el.call(:getAttribute, "action").to_s
-  target  = el.call(:getAttribute, "target").to_s
-  content = el.call(:querySelector, "template")[:innerHTML].to_s rescue ""
-  node    = doc.call(:getElementById, target)
-  case action
-  when "append" then node.call(:insertAdjacentHTML, "beforeend", content)
-  end
-end
-        `);
-      }
-
-    </script>
   </body>
 </html>
