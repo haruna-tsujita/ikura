@@ -1,10 +1,8 @@
 # Ikura
 
-An interactive gunkan-maki sushi toy server powered by Ruby Wasm.
+A minimal Turbo Stream toy built on Ruby Wasm and raw TCP sockets — no Rails, no frontend framework, no external runtime dependencies.
 
-Click anywhere on the sushi in the browser to place ikura (salmon roe). The click handling runs entirely in Ruby via WebAssembly, and DOM updates are delivered as Turbo Streams — no frontend framework required.
-
-The server is built on Ruby's built-in `socket` library (TCPServer), so there are **no external runtime dependencies**.
+Click anywhere on the gunkan-maki sushi in the browser to place ikura (salmon roe). Click handling runs entirely in Ruby via WebAssembly, and DOM updates are delivered as Turbo Streams. The server is built on Ruby's built-in `TCPServer`.
 
 ## Installation
 

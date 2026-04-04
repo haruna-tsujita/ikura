@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.authors = ["haruna-tsujita"]
   spec.email = ["snwxxx29@gmail.com"]
 
-  spec.summary = "An interactive gunkan-maki sushi toy server powered by Ruby Wasm"
-  spec.description = "Ikura is a tiny HTTP server that renders an interactive gunkan-maki sushi in the browser. Click anywhere on the sushi to place ikura (salmon roe) using Ruby running in WebAssembly."
+  spec.summary = "A minimal Turbo Stream toy built on Ruby Wasm and raw TCP sockets."
+  spec.description = "Ikura is a minimal Turbo Stream implementation built from scratch using Ruby Wasm and Ruby's built-in TCPServer — no Rails, no frontend framework, no external runtime dependencies. Click anywhere on the gunkan-maki sushi in the browser to place ikura (salmon roe); click events run in Ruby via WebAssembly and DOM updates arrive as Turbo Streams."
   spec.homepage = "https://github.com/haruna-tsujita/ikura"
   spec.license = "MIT"
   spec.required_ruby_version = ">= 4.0.2"
