@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8">
+    <title>🍣 Ikura</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { background: #ffffff; overflow: hidden; width: 100vw; height: 100vh; }
+
+      #board { position: relative; width: 100vw; height: 100vh; }
+
+      .gunkan {
+        position: absolute;
+        left: 50%; top: 50%;
+        transform: translate(-50%, -50%);
+        width: 140px;
+        height: 120px;
+        background: #1b2b1b;
+        border-radius: 50% / 20%;
+        box-shadow: inset 0 -10px 20px rgba(0,0,0,0.5);
+        z-index: 10;
+        pointer-events: none;
+      }
+      .gunkan-top {
+        position: absolute;
+        top: 2px; left: 8px;
+        width: 124px; height: 40px;
+        background: radial-gradient(ellipse at 50% 60%, #f8f4ec, #e8e0cc);
+        border-radius: 50%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="board">
+      <div class="gunkan">
+        <div class="gunkan-top">
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
