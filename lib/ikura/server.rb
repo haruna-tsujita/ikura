@@ -28,7 +28,8 @@ module Ikura
     def run
       server = TCPServer.new(@port)
       $stdout.sync = true
-      puts "🍣  http://localhost:#{@port}"
+      url = "http://localhost:#{@port}"
+      puts "🍣  #{terminal_link(url)}"
       puts "    (Ctrl+C to stop)\n\n"
 
       loop do
@@ -46,6 +47,12 @@ module Ikura
     end
 
     private
+
+    def terminal_link(url, label = url)
+      return label unless $stdout.tty?
+
+      "\e]8;;#{url}\a#{label}\e]8;;\a"
+    end
 
     def handle(client, req)
       case [req[:method], req[:path]]
