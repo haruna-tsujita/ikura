@@ -12,7 +12,7 @@ module Ikura
       new(port:).run
     end
 
-    COORDS = [
+    IKURA_POINTS = [
       [50, 50], [35, 50], [65, 50], [20, 50], [80, 50],
       [50, 15], [35, 22], [65, 22], [20, 35], [80, 35],
       [50, 85], [35, 78], [65, 78], [20, 65], [80, 65],
@@ -59,8 +59,8 @@ module Ikura
       in ["GET", "/"]
         respond(client, type: "text/html; charset=utf-8", body: html_page)
       in ["POST", "/ikura"]
-        coord_idx = parse_form(req[:body])["coord"]&.to_i || 0
-        x, y = COORDS[coord_idx] || [50, 50]
+        ikura_point_idx = parse_form(req[:body])["ikura_point"]&.to_i || 0
+        x, y = IKURA_POINTS[ikura_point_idx] || [50, 50]
         id = @ikura_count
         @ikura_count += 1
 
@@ -79,8 +79,9 @@ module Ikura
     end
 
     def html_page
-      coords_html = COORDS.each_with_index.map { |(x, y), i|
-        "<div class='coord' style='left:#{x}%;top:#{y}%'></div>"
+
+      ikura_points_html = IKURA_POINTS.each_with_index.map { |(x, y), i|
+        "<div class='ikura_point' style='left:#{x}%;top:#{y}%'></div>"
       }.join("\n")
 
       ERB.new(File.read(TEMPLATE_PATH)).result(binding)

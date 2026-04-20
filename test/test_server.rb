@@ -27,7 +27,7 @@ class TestServer < Minitest::Test
   end
 
   def test_parse_request_post_with_body
-    body = "coord=3"
+    body = "ikura_point=3"
     input = "POST /ikura HTTP/1.1\r\nContent-Length: #{body.bytesize}\r\n\r\n#{body}"
     io = StringIO.new(input)
     req = @server.send(:parse_request, io)
@@ -47,9 +47,9 @@ class TestServer < Minitest::Test
 
   # parse_form
 
-  def test_parse_form_parses_coord
-    result = @server.send(:parse_form, "coord=3")
-    assert_equal "3", result["coord"]
+  def test_parse_form_parses_ikura_point
+    result = @server.send(:parse_form, "ikura_point=3")
+    assert_equal "3", result["ikura_point"]
   end
 
   def test_parse_form_empty_string
@@ -121,7 +121,7 @@ class TestServer < Minitest::Test
 
   def test_handle_post_ikura_returns_turbo_stream
     out = StringIO.new(String.new(encoding: "UTF-8"))
-    req = { method: "POST", path: "/ikura", headers: {}, body: "coord=0" }
+    req = { method: "POST", path: "/ikura", headers: {}, body: "ikura_point=0" }
     @server.send(:handle, out, req)
 
     assert_match %r{text/vnd.turbo-stream.html}, out.string
@@ -132,7 +132,7 @@ class TestServer < Minitest::Test
   def test_handle_post_ikura_increments_id
     out1 = StringIO.new(String.new(encoding: "UTF-8"))
     out2 = StringIO.new(String.new(encoding: "UTF-8"))
-    req = { method: "POST", path: "/ikura", headers: {}, body: "coord=0" }
+    req = { method: "POST", path: "/ikura", headers: {}, body: "ikura_point=0" }
     @server.send(:handle, out1, req)
     @server.send(:handle, out2, req)
 
@@ -140,9 +140,9 @@ class TestServer < Minitest::Test
     assert_match %r{ikura_1}, out2.string
   end
 
-  def test_handle_post_ikura_out_of_range_coord_falls_back
+  def test_handle_post_ikura_out_of_range_ikura_point_falls_back
     out = StringIO.new(String.new(encoding: "UTF-8"))
-    req = { method: "POST", path: "/ikura", headers: {}, body: "coord=999" }
+    req = { method: "POST", path: "/ikura", headers: {}, body: "ikura_point=999" }
     @server.send(:handle, out, req)
 
     assert_match %r{HTTP/1.1 200 OK}, out.string
