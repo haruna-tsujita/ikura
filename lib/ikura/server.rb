@@ -80,7 +80,6 @@ module Ikura
     end
 
     def html_page
-
       ikura_points_html = IKURA_POINTS.each_with_index.map { |(x, y), i|
         "<div class='ikura_point' style='left:#{x}%;top:#{y}%'></div>"
       }.join("\n")
