@@ -65,8 +65,8 @@ module Ikura
         id = @ikura_count
         @ikura_count += 1
 
-        jx = (x + rand(-8..8)).clamp(5, 95)
-        jy = (y + rand(-8..8)).clamp(5, 95)
+        jx = (x + rand(-10..10))
+        jy = (y + rand(-10..10))
 
         respond(client,
           type: "text/vnd.turbo-stream.html; charset=utf-8",
