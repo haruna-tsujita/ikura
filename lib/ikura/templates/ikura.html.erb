@@ -7,11 +7,10 @@
       import { DefaultRubyVM } from "https://cdn.jsdelivr.net/npm/@ruby/wasm-wasi@2.8.1/dist/browser/+esm";
       const res = await fetch("https://cdn.jsdelivr.net/npm/@ruby/4.0-wasm-wasi@2.8.1/dist/ruby+stdlib.wasm");
       const { vm } = await DefaultRubyVM(await WebAssembly.compileStreaming(res));
-      window.rubyVM = vm;
       vm.eval(`
 require "js"
 doc   = JS.global[:document]
-nodes = doc.call(:querySelectorAll, ".coord")
+nodes = doc.call(:querySelectorAll, ".ikura_point")
 nodes[:length].to_i.times do |i|
   node = nodes.call(:item, i)
   node[:style][:opacity] = "1"
@@ -19,7 +18,7 @@ nodes[:length].to_i.times do |i|
     opts = JS.eval("return {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: 'coord=#{i}'
+      body: 'ikura_point=#{i}'
     }")
     JS.global.fetch("/ikura", opts).call(:then, ->(response) {
       response.text().call(:then, ->(text) {
@@ -61,7 +60,6 @@ end
         border-radius: 50% / 20%;
         box-shadow: inset 0 -10px 20px rgba(0,0,0,0.5);
         z-index: 10;
-        pointer-events: none;
       }
       .gunkan-top {
         position: absolute;
@@ -71,12 +69,11 @@ end
         border-radius: 50%;
       }
 
-      .coord {
+      .ikura_point {
         position: absolute;
         transform: translate(-50%, -50%);
         width: 16px; height: 16px;
         cursor: crosshair;
-        pointer-events: all;
         opacity: 0;
       }
 
@@ -104,11 +101,10 @@ end
     <div id="board">
       <div class="gunkan">
         <div class="gunkan-top">
-          <%= coords_html %>
+          <%= ikura_points_html %>
           <ul id="ikura-layer"></ul>
         </div>
       </div>
     </div>
-
   </body>
 </html>
