@@ -32,6 +32,7 @@ module Ikura
       url = "http://localhost:#{@port}"
       puts "🍣  #{terminal_link(url)}"
       puts "    (Ctrl+C to stop)\n\n"
+      system("open", url) if RUBY_PLATFORM.include?("darwin")
 
       loop do
         client = server.accept
